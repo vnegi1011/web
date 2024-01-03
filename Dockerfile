@@ -4,4 +4,4 @@ WORKDIR /app
 COPY . /app
 RUN chmod +x ./gradlew && ./gradlew build
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "build/libs/*.jar"]
+ENTRYPOINT ["java", "-jar", "/app/build/libs/*.jar"]

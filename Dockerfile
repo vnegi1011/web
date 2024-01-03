@@ -5,4 +5,4 @@ COPY . /app
 RUN chmod +x ./gradlew && ./gradlew build 
 RUN ls -R /app
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "/app/build/libs/*.jar"]
+ENTRYPOINT ["java", "-jar", "/app/build/libs/web-0.0.1-SNAPSHOT.jar"]

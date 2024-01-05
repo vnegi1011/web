@@ -7,8 +7,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "\"user\"")
-public class User {
+@Table
+public class CarpoolUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

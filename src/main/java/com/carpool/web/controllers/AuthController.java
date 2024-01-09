@@ -1,50 +1,62 @@
 package com.carpool.web.controllers;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.carpool.web.models.CarpoolUser;
 import com.carpool.web.models.RegistrationRequest;
-import com.carpool.web.repositories.UserRepository;
+import com.carpool.web.models.dto.SignupRequest;
+import com.carpool.web.models.entities.UserProfile;
+import com.carpool.web.services.SignupService;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 public class AuthController {
   
     @Autowired
-    private UserRepository userRepository;
+    private SignupService signupService;
 
     
     @PostMapping("/signup")
-    public ResponseEntity<String> registerUser(RegistrationRequest registrationRequest) {
-       
-        CarpoolUser user = new CarpoolUser();
-        user.setUsername(registrationRequest.getUsername());
-        user.setPassword(registrationRequest.getPassword()); // You should hash the password, consider using BCryptPasswordEncoder
+        public ResponseEntity<Map<String, Object>> signup(SignupRequest signupRequest) {
+        // Validate and process the signup request
 
-        // Save the user to the database
-        userRepository.save(user);
+        // Example:
+        UserProfile userProfile = new UserProfile();
+        userProfile.setFirstname(signupRequest.getFirstname());
+        userProfile.setLastname(signupRequest.getLastname());
+        userProfile.setMiddlename(signupRequest.getMiddlename());
 
-        return new ResponseEntity<>("User registered successfully", HttpStatus.OK);
+        try {
+            signupService.signup(userProfile, signupRequest.getEmail(), signupRequest.getPassword());
+            Map<String, Object> response = new HashMap<>();
+            response.put("data", true);
+            response.put("message", "Signup successful");
+            response.put("status", true);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (IllegalArgumentException e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("data", null);
+            response.put("message", e.getMessage());
+            response.put("status", false);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
     }
 
     @PostMapping("/login")
     public ResponseEntity<Boolean> authenticateUser(RegistrationRequest loginRequest) {
         // Simulate user validation; replace this with actual logic
-        boolean isValidUser = validateUser(loginRequest.getUsername(), loginRequest.getPassword());
+        //boolean isValidUser = validateUser(loginRequest.getUsername(), loginRequest.getPassword());
 
-        return ResponseEntity.ok(isValidUser);
+        return ResponseEntity.ok(true);
     }
-
-    // Simple user validation logic (replace with actual logic)
-    private boolean validateUser(String username, String password) {
-        // Replace this with your actual user validation logic (e.g., check against a database)
-        CarpoolUser user = userRepository.findByUsername(username);
-
-        // Check if the user exists and the password matches (in a real-world scenario, use proper password hashing)
-        return user != null && user.getPassword().equals(password);    }
 }
